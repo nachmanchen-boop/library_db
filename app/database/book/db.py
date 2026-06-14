@@ -1,7 +1,8 @@
 from database.db.db_connection import get_connection
-from models.book.modle import create_book
+from models.book.modle import Create_book
+from models.book.modle import Patch_book
 class Book():
-    def create_book(self,data:create_book):
+    def create_book(self,data:Create_book):
         with get_connection() as conn :
             with conn.cursor(dictionary=True) as cursor:
                 query = """
@@ -33,28 +34,20 @@ class Book():
 
                 by_id = cursor.fetchone()
                 return by_id
-    def update_by_id(self,id:int,data:create_book):
+    def update_by_id(self,id:int,data:dict):
         with get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
-                query= """UPDATE books 
-                SET 
-                    title = %s,author = %s,genre=%s,is_available=%s,borrowed_by_member_id=%s
-                    WHERE id = %s
-                    
-                """
-                val = (
-                    data.title,
-                    data.author,
-                    data.genre,
-                    data.is_available,
-                    data.borrowed_by_member_id,
-                    id
-                    
-                )
-                cursor.execute(query,val)
+                parts = []
+                values = []
+                for key,value in data.items() :
+                    parts.append(f"{key} = %s")
+                    values.append(value)
+                values.append(id)
+                query = f"UPDATE books SET {", ".join(parts)} WHERE id = %s"
+                cursor.execute(query,values)
                 conn.commit()
-                return cursor.rowcount > 0
-                
+                is_change = cursor.rowcount > 0 
+                return is_change
 
 
 
