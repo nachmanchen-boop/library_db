@@ -19,6 +19,21 @@ class Book():
                 last_id = cursor.lastrowid
                 conn.commit()
                 return last_id
+    def get_the_books(self):
+        with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT * FROM books")
+                data = cursor.fetchall()
+                return data
+    def get_by_id(self,id:int):
+        with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                query = "SELECT * FROM books WHERE id = %s"
+                cursor.execute(query,(id,))
+
+                by_id = cursor.fetchone()
+                return by_id
+
 
 
 
