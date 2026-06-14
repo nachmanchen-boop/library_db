@@ -3,14 +3,10 @@ from fastapi import FastAPI
 from database.db.db_connection import get_connection
 from logger import logger
 from database.create_tables import create_the_tables
+from routes.book.routes import router as book_router
 
 app = FastAPI()
-
-
-@app.get("/")
-def root():
-    logger.info("GET / called")
-    return {"message": "API is running"}
+app.include_router(book_router,prefix="/books")
 
 
 if __name__ == "__main__":

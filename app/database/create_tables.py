@@ -5,7 +5,7 @@ def create_the_tables():
         with conn.cursor(dictionary=True) as cursor:
             query_books = """
                     CREATE TABLE IF NOT EXISTS books(
-                    id INT PRIMAY KEY AUTO_INCREMENT,
+                    id INT PRIMARY KEY AUTO_INCREMENT,
                     title VARCHAR(50) NOT NULL,
                     author VARCHAR(50) NOT NULL,
                     genre ENUM('Fiction','Non-Fiction','Science','Other') NOT NULL,

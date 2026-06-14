@@ -31,13 +31,13 @@ library-api/
 id PRIMERY KEY AUTO_INCREMENT
 title VARCHAR(50) NOT NULL
 author VARCHAR(50) NOT NULL
-genre ENUM(Fiction | Non-Fiction | Science | History | Other) NOT NULL
+genre ENUM(Fiction | 'Non-Fiction' | 'Science' | 'History' | 'Other') NOT NULL
 is_available BOOLEAN NOT NULL
 id_member_by_borrowed null | id
 
 
 ## members
-id PRIMERY KEY AUTO_INCREMENT
+id PRIMARY KEY AUTO_INCREMENT
 name VARCHAR(50) NOT NULL
 email VARCHAR(50) UNIQUE
 is_activ BOOLEAN NOT NULL
@@ -59,7 +59,7 @@ total_borrows int
 רשימת נקודות קצה
 ### Books
 
-GET "/books" | יצירת ספר |
+POST "/books" | יצירת ספר |
 GET "/books  | כל הספרים |
 GET "/books{id}  |  ספר לפי ID
 PATCH "/book/{id}"| עדכון ספר  
