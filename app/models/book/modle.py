@@ -23,3 +23,10 @@ class Patch_book(BaseModel):
     is_available :Optional[bool] =None
     borrowed_by_member_id : Optional[int] = None
 
+class Ret_bro_enum(str,Enum):
+    ret="return"
+    borrow="borrow"
+class Ret_bro(BaseModel):
+    id :int
+    ret_bro:Ret_bro_enum
+    member_id:int

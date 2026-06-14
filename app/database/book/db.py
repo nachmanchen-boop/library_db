@@ -1,6 +1,8 @@
 from database.db.db_connection import get_connection
-from models.book.modle import Create_book
-from models.book.modle import Patch_book
+from models.book.modle import Create_book,Ret_bro
+from fastapi import HTTPException
+from database.member.db import Members
+members = Members()
 class Book():
     def create_book(self,data:Create_book):
         with get_connection() as conn :
@@ -49,5 +51,54 @@ class Book():
                 is_change = cursor.rowcount > 0 
                 return is_change
 
+    def set_available(self,body:Ret_bro):
+        with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                book = self.get_by_id(body.id)
+                member = members.get_by_id(body.member_id)
+                if not book:
+                    raise HTTPException(status_code=404,detail=f"book id {body.id} not found")
+                if not member :
+                        raise HTTPException(status_code=404,detail=f"member id {body.member_id} not found")
+                if body.ret_bro == "borrow":
+                   
+                    if book["is_available"]== False:
+                        raise HTTPException(status_code=400,detail="Book is already borrowed")
+                    
+                    if member ["is_activ"] == False:
+                        raise HTTPException(status_code=400,detail="the member is not active")
+                    if member["total_borrows"]>2:
+                        raise HTTPException(status_code=400,detail="to the member have mor then 2 books")
+                    data ={
+                        "is_available":False,
+                        "borrowed_by_member_id":body.member_id
+                    }
+                    self.update_by_id(body.id,data)
+                    data_member={
+                        "total_borrows":member["total_borrows"] + 1
+
+                    }
+                    members.patch_member(body.member_id,data_member)
+                    return {"status": "success", "message": "Book borrowed successfully"}
+                else:
+                    if body.member_id != book["borrowed_by_member_id"]:
+                        raise HTTPException(status_code=400,detail=f"the member {body.member_id} is not the ouner")
+                    data ={
+                        "is_available":True,
+                        "borrowed_by_member_id":None
+                    }
+                    self.update_by_id(body.id,data)
+                    data_member={
+                        "total_borrows":member["total_borrows"] - 1
+
+                    }
+                    members.patch_member(body.member_id,data_member)
+
+                    return {"status": "success", "message": "Book return  successfully"}
+
+
+                    
+                    
+                
 
 

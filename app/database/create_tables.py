@@ -21,9 +21,9 @@ def create_the_tables():
                     CREATE TABLE IF NOT EXISTS members(
                     id INT PRIMARY KEY AUTO_INCREMENT,
                     name VARCHAR(50) NOT NULL,
-                    email VARCHAR(50) UNIQUE,
+                    email VARCHAR(50) NOT NULL UNIQUE,
                     is_activ BOOLEAN NOT NULL,
-                    total_borrows INT
+                    total_borrows INT NOT NULL
                         )
                             """
             cursor.execute(query_members)

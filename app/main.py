@@ -4,9 +4,13 @@ from database.db.db_connection import get_connection
 from logger import logger
 from database.create_tables import create_the_tables
 from routes.book.routes import router as book_router
+from routes.members.routes import router as member_router
+
 
 app = FastAPI()
 app.include_router(book_router,prefix="/books")
+app.include_router(member_router,prefix="/members")
+
 
 
 if __name__ == "__main__":

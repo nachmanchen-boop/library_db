@@ -1,5 +1,5 @@
 from fastapi import APIRouter,HTTPException
-from models.book.modle import Create_book,Patch_book
+from models.book.modle import Create_book,Patch_book,Ret_bro
 from database.book.db import Book
 router = APIRouter()
 book = Book()
@@ -26,3 +26,14 @@ def update_book(id:int, body:Patch_book):
     if not is_changde:
         raise HTTPException(status_code=404,detail=f"id {id} not found")
     return {"message":f"the bookk with id {id} changde"}
+@router.patch("/{id}/borrow/{member_id}")
+def set_not_available(body:Ret_bro):
+    data = book.set_available(body)
+    return data
+    
+
+    
+@router.patch("/{id}/return/{member_id}")
+def set_is_available(body:Ret_bro):
+    data = book.set_available(body)
+    return data
