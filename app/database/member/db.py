@@ -50,3 +50,27 @@ class Members :
                 is_change = cursor.rowcount > 0 
                 return is_change
 
+    def disactivate_member(self,id):
+        with get_connection() as conn :
+            with conn.cursor(dictionary=True) as cursor:
+                query = "UPDATE members SET is_activ = False WHERE id = %s"
+                cursor.execute(query,(id,))
+                conn.commit()
+                data = cursor.rowcount >0
+                return data
+    def activate_member(self,id):
+        with get_connection() as conn :
+            with conn.cursor(dictionary=True) as cursor:
+                query = "UPDATE members SET is_activ = True WHERE id = %s"
+                cursor.execute(query,(id,))
+                conn.commit()
+                data = cursor.rowcount >0
+                return data
+    def get_count_activ_members(self):
+         with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT COUNT(*) AS activ_members FROM members WHERE is_activ = True")
+                count = cursor.fetchone()
+                return count
+
+                    

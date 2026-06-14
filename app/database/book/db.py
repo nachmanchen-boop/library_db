@@ -67,7 +67,7 @@ class Book():
                     
                     if member ["is_activ"] == False:
                         raise HTTPException(status_code=400,detail="the member is not active")
-                    if member["total_borrows"]>2:
+                    if self.count_borrowed_books(body.member_id)>3:
                         raise HTTPException(status_code=400,detail="to the member have mor then 2 books")
                     data ={
                         "is_available":False,
@@ -88,16 +88,57 @@ class Book():
                         "borrowed_by_member_id":None
                     }
                     self.update_by_id(body.id,data)
-                    data_member={
-                        "total_borrows":member["total_borrows"] - 1
-
-                    }
-                    members.patch_member(body.member_id,data_member)
+                    
 
                     return {"status": "success", "message": "Book return  successfully"}
 
+    def count_borrowed_books(self,id):
+        with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                query="SELECT COUNT(*) AS count_books FROM books WHERE borrowed_by_member_id = %s"
+                cursor.execute(query,(id,))
+                count = cursor.fetchone()
+                return count["count_books"]
+    def get_count_books(self):
+         with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT COUNT(*) AS count_books FROM books")
+                count = cursor.fetchone()
+                return count
+    def get_count_available_books(self):
+         with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT COUNT(*) AS count_available FROM books WHERE is_available = True")
+                count = cursor.fetchone()
+                return count
+    def get_count_not_available_books(self):
+         with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT COUNT(*) AS count_not_available FROM books WHERE is_available = False")
+                count = cursor.fetchone()
+                return count
+    def books_by_genre(self,genre):
+        with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                query = "SELECT genre, COUNT(*) AS count_books FROM books WHERE genre = %s"
+                cursor.execute(query,(genre,))
+                count = cursor.fetchone()
+                return count
+    def top_count(self):
+         with get_connection() as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                query = """
+                SELECT id, name, email, total_borrows 
+                FROM members 
+                ORDER BY total_borrows DESC 
+                LIMIT 1
+                """
+                cursor.execute(query)
+                top_member = cursor.fetchone()
+                
+                return top_member
 
-                    
+
                     
                 
 

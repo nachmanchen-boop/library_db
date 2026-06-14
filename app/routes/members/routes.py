@@ -31,4 +31,15 @@ def update_member(id:int, data:Update_member):
     if not is_changde:
         raise HTTPException(status_code=404,detail=f"id {id} not found")
     return {"message":f"the member with id {id} changde"}
-    
+@router.patch("/{id}/deactivate")
+def deactivate_member(id):
+    data = members.disactivate_member(id)
+    if not data :
+        raise HTTPException(status_code=404,detail=f"id {id}not found")
+    return {"message":data}
+@router.patch("/{id}/activate")
+def deactivate_member(id):
+    data = members.activate_member(id)
+    if not data :
+        raise HTTPException(status_code=404,detail=f"id {id}not found")
+    return {"message":data}
