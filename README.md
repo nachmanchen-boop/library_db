@@ -59,7 +59,7 @@ total_borrows int
 רשימת נקודות קצה
 ### Books
 
-POST "/books" | יצירת ספר |
+GET "/books" | יצירת ספר |
 GET "/books  | כל הספרים |
 GET "/books{id}  |  ספר לפי ID
 PATCH "/book/{id}"| עדכון ספר  
