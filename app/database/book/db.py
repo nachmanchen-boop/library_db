@@ -3,6 +3,8 @@ from models.book.modle import Create_book,Ret_bro
 from fastapi import HTTPException
 from database.member.db import Members
 members = Members()
+from logger import logger
+
 class Book():
     def create_book(self,data:Create_book):
         with get_connection() as conn :
@@ -54,20 +56,27 @@ class Book():
     def set_available(self,body:Ret_bro):
         with get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
+                logger.info("start to check set_available if return or borrow")
                 book = self.get_by_id(body.id)
                 member = members.get_by_id(body.member_id)
                 if not book:
+                    logger.warning("book id {body.id} not found")
                     raise HTTPException(status_code=404,detail=f"book id {body.id} not found")
                 if not member :
+                        logger.warning(f"member id {body.member_id} not found")
                         raise HTTPException(status_code=404,detail=f"member id {body.member_id} not found")
                 if body.ret_bro == "borrow":
+                    logger.info("its borrow")
                    
                     if book["is_available"]== False:
+                        logger.warning("Book is already borrowed")
                         raise HTTPException(status_code=400,detail="Book is already borrowed")
                     
                     if member ["is_activ"] == False:
+                        logger.warning("the member is not active")
                         raise HTTPException(status_code=400,detail="the member is not active")
                     if self.count_borrowed_books(body.member_id)>3:
+                        logger.warning("to the member have mor then 2 books")
                         raise HTTPException(status_code=400,detail="to the member have mor then 2 books")
                     data ={
                         "is_available":False,
@@ -79,9 +88,11 @@ class Book():
 
                     }
                     members.patch_member(body.member_id,data_member)
-                    return {"status": "success", "message": "Book borrowed successfully"}
+                    logger.info("message: Book borrowed successfully")
+                    return {"status": "success", }
                 else:
                     if body.member_id != book["borrowed_by_member_id"]:
+                        logger.warning(f"the member {body.member_id} is not the ouner")
                         raise HTTPException(status_code=400,detail=f"the member {body.member_id} is not the ouner")
                     data ={
                         "is_available":True,
@@ -89,7 +100,7 @@ class Book():
                     }
                     self.update_by_id(body.id,data)
                     
-
+                    logger.info("message: Book return  successfully")
                     return {"status": "success", "message": "Book return  successfully"}
 
     def count_borrowed_books(self,id):
@@ -98,24 +109,31 @@ class Book():
                 query="SELECT COUNT(*) AS count_books FROM books WHERE borrowed_by_member_id = %s"
                 cursor.execute(query,(id,))
                 count = cursor.fetchone()
+                logger.info("end count_borrowed_books")
                 return count["count_books"]
     def get_count_books(self):
          with get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
                 cursor.execute("SELECT COUNT(*) AS count_books FROM books")
                 count = cursor.fetchone()
+                logger.info("end get_count_books")
+
                 return count
     def get_count_available_books(self):
          with get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
                 cursor.execute("SELECT COUNT(*) AS count_available FROM books WHERE is_available = True")
                 count = cursor.fetchone()
+                logger.info("end get_count_available_books")
+
                 return count
     def get_count_not_available_books(self):
          with get_connection() as conn:
             with conn.cursor(dictionary=True) as cursor:
                 cursor.execute("SELECT COUNT(*) AS count_not_available FROM books WHERE is_available = False")
                 count = cursor.fetchone()
+                logger.info("end get_count_not_available_books")
+
                 return count
     def books_by_genre(self,genre):
         with get_connection() as conn:
@@ -123,6 +141,8 @@ class Book():
                 query = "SELECT genre, COUNT(*) AS count_books FROM books WHERE genre = %s"
                 cursor.execute(query,(genre,))
                 count = cursor.fetchone()
+                logger.info("end books_by_genre")
+
                 return count
     def top_count(self):
          with get_connection() as conn:
@@ -135,6 +155,8 @@ class Book():
                 """
                 cursor.execute(query)
                 top_member = cursor.fetchone()
+                logger.info("end top_count")
+
                 
                 return top_member
 
